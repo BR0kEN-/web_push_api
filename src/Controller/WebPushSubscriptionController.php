@@ -23,7 +23,7 @@ class WebPushSubscriptionController extends ControllerBase {
    *
    * @var \Drupal\web_push_api\WebPushFactory
    */
-  protected WebPushFactory $webPushFactory;
+  protected $webPushFactory;
 
   /**
    * {@inheritdoc}
@@ -39,7 +39,7 @@ class WebPushSubscriptionController extends ControllerBase {
   public static function create(ContainerInterface $container): self {
     return new static(
       $container->get('web_push_api.factory'),
-      $container->get('string_translation'),
+      $container->get('string_translation')
     );
   }
 
@@ -121,7 +121,7 @@ class WebPushSubscriptionController extends ControllerBase {
    *   The list of errors (empty if none).
    */
   protected static function manage(WebPushSubscriptionStorage $storage, ?WebPushSubscriptionInterface $subscription, iterable $body): array {
-    $subscription ??= $storage->create();
+    $subscription = $subscription ?? $storage->create();
 
     foreach ($body as $key => $value) {
       $subscription->set($key, $value);

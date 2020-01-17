@@ -5,3 +5,6 @@ package: 'Web services'
 core: 8.x
 
 configure: web_push_api.settings
+
+dependencies:
+  - drupal:user

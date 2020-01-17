@@ -3,7 +3,6 @@
 namespace Drupal\web_push_api;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Url;
 use Drupal\web_push_api\Entity\WebPushSubscriptionStorageInjection;
@@ -23,7 +22,7 @@ class WebPushFactory {
    *
    * @var \Drupal\Core\Config\ImmutableConfig
    */
-  protected ImmutableConfig $config;
+  protected $config;
 
   /**
    * {@inheritdoc}
@@ -64,7 +63,7 @@ class WebPushFactory {
     $auth = [];
 
     foreach (['publicKey' => $public_key, 'privateKey' => $private_key] as $key => $path) {
-      $path ??= $this->config->get($key) ?: '';
+      $path = $path ?? $this->config->get($key) ?: '';
 
       if (!\file_exists($path)) {
         throw new FileNotExistsException($key, $path);

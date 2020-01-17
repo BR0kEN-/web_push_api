@@ -25,6 +25,8 @@ class WebPushSubscriptionListBuilder extends EntityListBuilder {
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Core\Entity\EntityMalformedException
    */
   public function buildRow(EntityInterface $entity): array {
     \assert($entity instanceof WebPushSubscriptionInterface);

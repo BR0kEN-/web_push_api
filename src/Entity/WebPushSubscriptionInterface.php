@@ -3,7 +3,7 @@
 namespace Drupal\web_push_api\Entity;
 
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Session\AccountInterface;
+use Drupal\user\UserInterface;
 use Minishlink\WebPush\SubscriptionInterface;
 
 /**
@@ -14,10 +14,10 @@ interface WebPushSubscriptionInterface extends SubscriptionInterface, ContentEnt
   /**
    * Returns the account of a subscription owner.
    *
-   * @return \Drupal\Core\Session\AccountInterface|null
+   * @return \Drupal\user\UserInterface|null
    *   The account of a subscription owner.
    */
-  public function getOwner(): ?AccountInterface;
+  public function getOwner(): ?UserInterface;
 
   /**
    * Returns the subscription creation date.

@@ -10,7 +10,7 @@ Do not expect this project to have something from this list:
 
 ## Requirements
 
-- PHP 7.4+ and the dependencies of https://github.com/web-push-libs/web-push-php
+- PHP 7.2+ and the dependencies of https://github.com/web-push-libs/web-push-php
 
 ## Installation
 

@@ -14,14 +14,14 @@ class FileException extends FileExceptionBase {
    *
    * @var string
    */
-  protected string $id;
+  protected $id;
 
   /**
    * The path to file.
    *
    * @var string
    */
-  protected string $path;
+  protected $path;
 
   /**
    * {@inheritdoc}

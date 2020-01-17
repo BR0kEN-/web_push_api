@@ -14,7 +14,7 @@ class WebPushData implements \JsonSerializable {
    *
    * @var array
    */
-  protected array $options = [];
+  protected $options = [];
 
   /**
    * {@inheritdoc}

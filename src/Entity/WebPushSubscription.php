@@ -6,8 +6,8 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
+use Drupal\user\UserInterface;
 use function t;
 
 /**
@@ -37,7 +37,7 @@ class WebPushSubscription extends ContentEntityBase implements WebPushSubscripti
   /**
    * {@inheritdoc}
    */
-  public function getOwner(): ?AccountInterface {
+  public function getOwner(): ?UserInterface {
     return $this->get('uid')->entity;
   }
 

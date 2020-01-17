@@ -28,14 +28,14 @@ class WebPushSettingsForm extends ConfigFormBase {
    *
    * @var \Drupal\web_push_api\WebPushFactory
    */
-  protected WebPushFactory $webPushFactory;
+  protected $webPushFactory;
 
   /**
    * The path to "web_push_api" module.
    *
    * @var string
    */
-  protected string $modulePath;
+  protected $modulePath;
 
   /**
    * {@inheritdoc}
@@ -53,7 +53,7 @@ class WebPushSettingsForm extends ConfigFormBase {
     return new static(
       $container->get('config.factory'),
       $container->get('module_handler'),
-      $container->get('web_push_api.factory'),
+      $container->get('web_push_api.factory')
     );
   }
 

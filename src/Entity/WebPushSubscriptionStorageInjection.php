@@ -12,7 +12,7 @@ trait WebPushSubscriptionStorageInjection {
    *
    * @var \Drupal\web_push_api\Entity\WebPushSubscriptionStorage
    */
-  private WebPushSubscriptionStorage $storage;
+  private $storage;
 
   /**
    * Returns the storage Web Push API subscriptions.
