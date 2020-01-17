@@ -32,5 +32,8 @@
                 "#267: Define the `SubscriptionInterface`": "https://patch-diff.githubusercontent.com/raw/web-push-libs/web-push-php/pull/268.patch"
             }
         }
+    },
+    "scripts": {
+        "pre-install-cmd": "bash ./tests/drupalci.provision.sh"
     }
 }

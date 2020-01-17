@@ -113,4 +113,5 @@ Do not expect this project to have something from this list:
 
 ## Similar projects
 
+- https://www.drupal.org/project/browser_push_notification
 - https://www.drupal.org/project/web_push_notification
