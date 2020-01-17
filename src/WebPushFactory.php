@@ -46,7 +46,7 @@ class WebPushFactory {
    * @param array $options
    *   The values for {@see \Drupal\web_push_api\WebPush::setDefaultOptions()}.
    * @param array $client_options
-   *   The values for {@see \GuzzleHttp\Client::__construct()}
+   *   The values for {@see \GuzzleHttp\Client::__construct()}.
    *
    * @return \Drupal\web_push_api\WebPush
    *   The service for dispatching notifications.

@@ -7,6 +7,8 @@ web_push_api.subscription:
     - PATCH
     - DELETE
   requirements:
+    # The Push API subscriptions can be created for anonymous users too. If
+    # someone decides to share this then we'll bother them by our notifications.
     _access: 'TRUE'
 
 web_push_api.settings:

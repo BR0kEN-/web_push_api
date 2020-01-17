@@ -22,7 +22,7 @@ Do not expect this project to have something from this list:
 
 - Generate a key-pair for [Voluntary Application Server Identification (VAPID) for Web Push](https://tools.ietf.org/id/draft-ietf-webpush-vapid-03.html). Store `public.key` and `private.key` outside of your document root.
 
-  ```bash
+  ```bash configure-keys
   openssl ecparam -genkey -name prime256v1 -out private.pem
   openssl ec -in private.pem -pubout -outform DER|tail -c 65|base64|tr -d '=' |tr '/+' '_-' >> public.key
   openssl ec -in private.pem -outform DER|tail -c +8|head -c 32|base64|tr -d '=' |tr '/+' '_-' >> private.key
