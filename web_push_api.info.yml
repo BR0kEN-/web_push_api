@@ -1,0 +1,7 @@
+name: 'Web Push API'
+type: module
+description: 'Provides the Push API subscriptions storage and API for sending notifications to existing subscriptions.'
+package: 'Web services'
+core: 8.x
+
+configure: web_push_api.settings

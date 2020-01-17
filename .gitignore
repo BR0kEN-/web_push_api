@@ -1,0 +1,10 @@
+/*
+
+.*
+
+!/config/
+!/src/
+
+!/.gitignore
+!/composer.json
+!/web_push_api.*

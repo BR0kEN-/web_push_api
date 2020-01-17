@@ -1,0 +1,5 @@
+entity.web_push_subscription.collection:
+  title: 'View available subscriptions'
+  route_name: entity.web_push_subscription.collection
+  appears_on:
+    - web_push_api.settings

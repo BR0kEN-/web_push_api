@@ -1,0 +1,23 @@
+<?php declare(strict_types=1);
+
+/**
+ * @file
+ * Web Push API.
+ */
+
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Utility\Error;
+
+/**
+ * Implements hook_ENTITY_TYPE_delete().
+ *
+ * @internal
+ */
+function web_push_api_user_delete(AccountInterface $account): void {
+  try {
+    Drupal::getContainer()->get('web_push_api.factory')->getSubscriptionsStorage()->deleteByUserAccount($account);
+  }
+  catch (Exception $e) {
+    Drupal::logger(__FUNCTION__)->error(Error::renderExceptionSafe($e));
+  }
+}

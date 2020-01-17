@@ -1,0 +1,6 @@
+administer web push settings:
+  title: 'Administer Web Push API settings'
+
+administer web push subscriptions:
+  title: 'Administer Web Push Subscriptions'
+  description: 'Allows CRUD operations for the Web Push Subscriptions.'

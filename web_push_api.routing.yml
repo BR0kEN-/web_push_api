@@ -1,0 +1,30 @@
+web_push_api.subscription:
+  path: '/web-push-api/subscription'
+  defaults:
+    _controller: 'Drupal\web_push_api\Controller\WebPushSubscriptionController::subscription'
+  methods:
+    - POST
+    - PATCH
+    - DELETE
+  requirements:
+    _access: 'TRUE'
+
+web_push_api.settings:
+  path: '/admin/config/services/web-push-api'
+  defaults:
+    _form: 'Drupal\web_push_api\Form\WebPushSettingsForm'
+    _title: 'Web Push API settings'
+  requirements:
+    _permission: 'administer web push settings'
+  options:
+    _admin_route: TRUE
+
+entity.web_push_subscription.collection:
+  path: '/admin/config/services/web-push-api/subscriptions'
+  defaults:
+    _title: 'Web Push API subscriptions'
+    _entity_list: web_push_subscription
+  requirements:
+    _permission: 'administer web push subscriptions'
+  options:
+    _admin_route: TRUE

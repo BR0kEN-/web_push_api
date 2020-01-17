@@ -1,0 +1,5 @@
+web_push_api.settings:
+  title: 'Web Push API'
+  parent: system.admin_config_services
+  route_name: web_push_api.settings
+  description: 'Configure Web Push API settings.'
