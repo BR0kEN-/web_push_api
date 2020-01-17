@@ -58,7 +58,7 @@ class WebPushNotification extends WebPushData {
    * {@inheritdoc}
    */
   public function setDirection(string $item): self {
-    \assert(\in_array($item, ['auto', 'ltr', 'rtl', TRUE]));
+    \assert(\in_array($item, ['auto', 'ltr', 'rtl'], TRUE));
     $this->options['dir'] = $item;
 
     return $this;
@@ -139,8 +139,7 @@ class WebPushNotification extends WebPushData {
   /**
    * {@inheritdoc}
    */
-  public function setVibrations(array $item): self {
-    \assert(!empty(\array_filter($item, '\is_numeric')));
+  public function setVibrations(int ...$item): self {
     $this->options['vibrate'] = $item;
 
     return $this;

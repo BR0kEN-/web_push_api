@@ -4,6 +4,7 @@
 
 !/config/
 !/src/
+!/tests/
 
 !/.gitignore
 !/composer.json

@@ -6,6 +6,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\web_push_api\Component\FileReader;
 use Drupal\web_push_api\Exception\FileNotExistsException;
 use Drupal\web_push_api\Exception\FileNotReadableException;
 use Drupal\web_push_api\WebPushFactory;
@@ -15,6 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * The Web Push API configuration form.
  */
 class WebPushSettingsForm extends ConfigFormBase {
+
+  use FileReader;
 
   public const CONFIG = 'web_push_api.settings';
 
@@ -129,42 +132,6 @@ class WebPushSettingsForm extends ConfigFormBase {
     catch (\Exception $e) {
       $form_state->setError($form, $e->getMessage());
     }
-  }
-
-  /**
-   * Returns the lines between "$start_pattern" and "$stop_pattern".
-   *
-   * @param string $path
-   *   The path to a file to read.
-   * @param string $start_pattern
-   *   The pattern to start collecting lines.
-   * @param string $stop_pattern
-   *   The pattern to stop collecting lines.
-   *
-   * @return string[]
-   *   The file fragment.
-   */
-  protected static function readFileFragment(string $path, string $start_pattern, string $stop_pattern): array {
-    $read = FALSE;
-    $data = [];
-
-    foreach (new \SplFileObject($path) as $line) {
-      $line = \trim($line);
-
-      if ($read) {
-        if (\preg_match($stop_pattern, $line) === 1) {
-          break;
-        }
-      }
-      else {
-        $read = \preg_match($start_pattern, $line) === 1;
-        continue;
-      }
-
-      $data[] = $line;
-    }
-
-    return $data;
   }
 
 }
