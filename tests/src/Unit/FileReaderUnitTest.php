@@ -8,6 +8,8 @@ use org\bovigo\vfs\vfsStream;
 
 /**
  * Tests the file reader.
+ *
+ * @group web_push_api
  */
 class FileReaderUnitTest extends UnitTestCase {
 

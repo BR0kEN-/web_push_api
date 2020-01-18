@@ -100,18 +100,16 @@ class WebPushSubscription extends ContentEntityBase implements WebPushSubscripti
   /**
    * {@inheritdoc}
    */
-  public static function preCreate(EntityStorageInterface $storage, array &$values): void {
-    parent::preCreate($storage, $values);
-
-    $values['uid'] = \Drupal::currentUser()->id();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function preSave(EntityStorageInterface $storage) {
     if (!$this->isNew()) {
-      $this->set('uid', $this->original->uid->target_id);
+      $uid_new = (int) $this->uid->target_id;
+      $uid_old = (int) $this->original->uid->target_id;
+
+      // A subscription that has had the owner cannot become anonymous.
+      if ($uid_old !== 0 && $uid_new === 0) {
+        $this->set('uid', $uid_old);
+      }
+
       $this->set('created', $this->original->created->value);
       $this->set('changed', \Drupal::time()->getRequestTime());
     }

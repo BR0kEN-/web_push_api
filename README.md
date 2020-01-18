@@ -66,7 +66,7 @@ Do not expect this project to have something from this list:
   }
   ```
 
-  The endpoint returns the `{"ok": boolean, "errors": string[]}` JSON structure. The `ok` is `true` if `errors` are empty and vice versa. The `errors` can contain validation errors and means an action you've undertaken didn't succeed.
+  The endpoint returns the `{"errors": string[]}` JSON structure. The `errors` will contain violations messages if an action you've undertaken didn't succeed. Otherwise empty.
 
 - Visit `/admin/config/services/web-push-api/subscriptions` and ensure the subscription was stored in Drupal DB.
 

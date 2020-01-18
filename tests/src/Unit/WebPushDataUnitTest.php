@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\web_push_api\Unit;
 
+use Drupal\Component\Serialization\Json;
 use Drupal\Tests\UnitTestCase;
 use Drupal\web_push_api\WebPushData;
 use Drupal\web_push_api\WebPushNotification;
@@ -9,6 +10,8 @@ use Drupal\web_push_api\WebPushNotificationAction;
 
 /**
  * Tests that data buckets properly format the data.
+ *
+ * @group web_push_api
  */
 class WebPushDataUnitTest extends UnitTestCase {
 
@@ -20,7 +23,7 @@ class WebPushDataUnitTest extends UnitTestCase {
     $json = '{"a":1,"b":{"c":2}}';
 
     static::assertSame($json, (string) $data);
-    static::assertSame($json, \json_encode($data));
+    static::assertSame($json, Json::encode($data));
     static::assertSame($data->toArray(), $data->jsonSerialize());
   }
 
@@ -71,7 +74,7 @@ class WebPushDataUnitTest extends UnitTestCase {
       'tag' => 'custom-tag',
       'timestamp' => 121391293192,
       'vibrate' => [200, 200, 0, 200, 100],
-    ], \json_decode(\json_encode($notification), TRUE));
+    ], Json::decode(Json::encode($notification)));
   }
 
   /**
