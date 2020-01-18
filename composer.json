@@ -25,16 +25,5 @@
     "support": {
         "issues": "https://www.drupal.org/project/issues/web_push_api",
         "source": "https://git.drupalcode.org/project/web_push_api"
-    },
-    "extra": {
-        "patches": {
-            "minishlink/web-push": {
-                "#267: Define the `SubscriptionInterface`": "https://patch-diff.githubusercontent.com/raw/web-push-libs/web-push-php/pull/268.patch"
-            }
-        }
-    },
-    "scripts": {
-        "pre-install-cmd": "bash ./tests/drupalci.provision.sh",
-        "pre-package-install": "bash ./tests/drupalci.provision.sh"
     }
 }

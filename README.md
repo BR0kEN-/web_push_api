@@ -20,6 +20,19 @@ Do not expect this project to have something from this list:
   composer require drupal/web_push_api
   ```
 
+  Navigate to the directory of `minishlink/web-push` package:
+
+  ```bash
+  cd "$(composer config vendor-dir)/minishlink/web-push/"
+  ```
+
+  Download and apply the patch:
+
+  ```bash
+  curl https://patch-diff.githubusercontent.com/raw/web-push-libs/web-push-php/pull/268.patch -o ./268.patch
+  patch -p1 < 268.patch
+  ```
+
 - Generate a key-pair for [Voluntary Application Server Identification (VAPID) for Web Push](https://tools.ietf.org/id/draft-ietf-webpush-vapid-03.html). Store `public.key` and `private.key` outside of your document root.
 
   ```bash configure-keys
