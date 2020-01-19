@@ -46,7 +46,7 @@ class WebPushDataUnitTest extends UnitTestCase {
    */
   public function testWebPushAuthVapid(): void {
     // Generate the subject.
-    // -------------------------------------------------------------------------
+    // ------------------------------------------------------------------------.
     $url_generator = $this->createMock(UrlGeneratorInterface::class);
     $url_generator
       ->expects(static::once())
@@ -68,7 +68,7 @@ class WebPushDataUnitTest extends UnitTestCase {
     ], $auth->toArray());
 
     // Custom subject.
-    // -------------------------------------------------------------------------
+    // ------------------------------------------------------------------------.
     $auth = new WebPushAuthVapid('a', 'b', ['subject' => 'mailto:me@site.org']);
     static::assertSame([
       'VAPID' => [
@@ -79,7 +79,7 @@ class WebPushDataUnitTest extends UnitTestCase {
     ], $auth->toArray());
 
     // Read keys from files.
-    // -------------------------------------------------------------------------
+    // ------------------------------------------------------------------------.
     $fs = vfsStream::setup('root');
 
     vfsStream::newFile('public.key')->at($fs)->withContent('the public yeah!');

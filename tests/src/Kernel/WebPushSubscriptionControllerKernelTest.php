@@ -309,7 +309,7 @@ class WebPushSubscriptionControllerKernelTest extends KernelTestBase {
    * @param \Drupal\web_push_api\Entity\WebPushSubscriptionInterface $subscription
    *   The subscription to check.
    * @param array $custom
-   *   The data to check
+   *   The data to check.
    */
   protected static function assertSubscription(WebPushSubscriptionInterface $subscription, array $custom = ['uid' => '0', 'utc_offset' => '+04:00']): void {
     $data = $custom + static::SUBSCRIPTION;
@@ -343,12 +343,12 @@ class WebPushSubscriptionControllerKernelTest extends KernelTestBase {
     $storage = $this->entityTypeManager->getStorage(WebPushSubscriptionInterface::ENTITY_TYPE);
 
     // Create a subscription.
-    // -------------------------------------------------------------------------
+    // ------------------------------------------------------------------------.
     static::assertRequestResponse($this->sendRequest('POST', static::SUBSCRIPTION));
     static::assertSubscription($storage->loadByEndpoint(static::SUBSCRIPTION['endpoint']));
 
     // Update the subscription (having a logged in user).
-    // -------------------------------------------------------------------------
+    // ------------------------------------------------------------------------.
     $account = $this->createUser();
     // The uid=0 subscription can receive a UID of a currently logged in user.
     // Thereafter the UID cannot be changed once set to a value above 0. That's
@@ -364,7 +364,7 @@ class WebPushSubscriptionControllerKernelTest extends KernelTestBase {
     ]);
 
     // Ensure the subscription that has had an owner cannot become unowned.
-    // -------------------------------------------------------------------------
+    // ------------------------------------------------------------------------.
     $this->container->get('current_user')->setAccount(new AnonymousUserSession());
     static::assertRequestResponse($this->sendRequest('PATCH', ['utc_offset' => 0] + static::SUBSCRIPTION));
     static::assertSubscription($storage->loadByEndpoint(static::SUBSCRIPTION['endpoint']), [
@@ -373,7 +373,7 @@ class WebPushSubscriptionControllerKernelTest extends KernelTestBase {
     ]);
 
     // Update failed.
-    // -------------------------------------------------------------------------
+    // ------------------------------------------------------------------------.
     $this->entityTypeManager->useTestStorage(TRUE);
 
     static::assertRequestResponse($this->sendRequest('PATCH', static::SUBSCRIPTION), [
@@ -381,20 +381,20 @@ class WebPushSubscriptionControllerKernelTest extends KernelTestBase {
     ]);
 
     // Deletion failed.
-    // -------------------------------------------------------------------------
+    // ------------------------------------------------------------------------.
     static::assertRequestResponse($this->sendRequest('DELETE', static::SUBSCRIPTION), [
       'Unable to delete the subscription.',
     ]);
 
     // Delete. We can pass the endpoint only.
-    // -------------------------------------------------------------------------
+    // ------------------------------------------------------------------------.
     $this->entityTypeManager->useTestStorage(FALSE);
 
     static::assertRequestResponse($this->sendRequest('DELETE', ['endpoint' => static::SUBSCRIPTION['endpoint']]));
     static::assertNull($storage->loadByEndpoint(static::SUBSCRIPTION['endpoint']));
 
     // Tests the storage and list builder.
-    // -------------------------------------------------------------------------
+    // ------------------------------------------------------------------------.
     $subscription = $storage->create(['uid' => $account->id()] + static::SUBSCRIPTION);
     $storage->save($subscription);
     static::assertCount(1, $storage->loadByUserAccount($account));
