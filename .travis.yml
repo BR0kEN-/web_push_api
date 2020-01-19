@@ -29,7 +29,7 @@ before_install:
 
 install:
   - test-drupal-project build
-  - cd "$(composer config vendor-dir)/minishlink/web-push/"
+  - cd "$DRUPAL_TRAVIS_PROJECT_BASEDIR/$(composer config vendor-dir)/minishlink/web-push/"
   - curl https://patch-diff.githubusercontent.com/raw/web-push-libs/web-push-php/pull/268.patch -o 268.patch
   - patch -p1 < 268.patch
 
