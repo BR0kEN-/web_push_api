@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 namespace Drupal\Tests\web_push_api\Kernel;
 
@@ -401,7 +401,7 @@ class WebPushSubscriptionControllerKernelTest extends KernelTestBase {
     $build = $this->entityTypeManager->getListBuilder(WebPushSubscriptionInterface::ENTITY_TYPE)->render();
     static::assertCount(1, $build['table']['#rows']);
     $storage->deleteByUserAccount($account);
-    static::assertCount(0, $storage->loadByUserId((int) $account->id()));
+    static::assertCount(0, $storage->loadByUserId($account->id()));
   }
 
 }

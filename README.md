@@ -87,7 +87,7 @@ Do not expect this project to have something from this list:
 - Use the module's API to craft and dispatch the notification.
 
   ```php
-  <?php declare(strict_types=1);
+  <?php
 
   use Drupal\Core\Utility\Error;
   use Drupal\web_push_api\Component\WebPush;

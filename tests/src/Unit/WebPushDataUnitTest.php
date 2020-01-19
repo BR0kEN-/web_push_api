@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 namespace Drupal\Tests\web_push_api\Unit;
 
@@ -151,11 +151,10 @@ class WebPushDataUnitTest extends UnitTestCase {
    * @param string $direction
    *   The value to set.
    *
-   * @expectedException \AssertionError
-   *
    * @dataProvider providerWebPushNotificationSetDirectionAssertion
    */
   public function testWebPushNotificationSetDirectionAssertion(string $direction): void {
+    $this->expectException(\AssertionError::class);
     $notification = new WebPushNotification('The notification!');
     $notification->setDirection($direction);
   }

@@ -13,7 +13,7 @@
         "browser push notifications"
     ],
     "require": {
-        "minishlink/web-push": "^5.2"
+        "minishlink/web-push": "5.2.5"
     },
     "authors": [
         {
@@ -25,5 +25,11 @@
     "support": {
         "issues": "https://www.drupal.org/project/issues/web_push_api",
         "source": "https://git.drupalcode.org/project/web_push_api"
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/BR0kEN-/web-push-php"
+        }
+    ]
 }
