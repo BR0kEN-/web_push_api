@@ -8,3 +8,4 @@ configure: web_push_api.settings
 
 dependencies:
   - drupal:user
+  - drupal:system

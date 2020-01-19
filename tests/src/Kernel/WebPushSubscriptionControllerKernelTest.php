@@ -1,11 +1,14 @@
 <?php declare(strict_types=1);
 
-namespace Drupal\Tests\web_push_api\Functional;
+namespace Drupal\Tests\web_push_api\Kernel;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Url;
-use Drupal\Tests\BrowserTestBase;
+use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\web_push_api\Controller\WebPushSubscriptionController;
 use Drupal\web_push_api\Entity\WebPushSubscriptionInterface;
 use Drupal\web_push_api\Entity\WebPushSubscriptionStorage;
@@ -13,9 +16,59 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * Defines the entity type manager that allows spoofing storage.
+ */
+class EntityTypeManagerTest extends EntityTypeManager {
+
+  /**
+   * The state of whether test storage should be used.
+   *
+   * @var bool
+   */
+  protected $useTestStorage = FALSE;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct(EntityTypeManager $manager) {
+    parent::__construct(
+      $manager->namespaces,
+      $manager->moduleHandler,
+      $manager->cacheBackend,
+      $manager->stringTranslation,
+      $manager->classResolver,
+      $manager->entityLastInstalledSchemaRepository
+    );
+
+    $this->setContainer($manager->container);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function useTestStorage(bool $state) {
+    $this->useTestStorage = $state;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getStorage($entity_type_id) {
+    $storage = parent::getStorage($entity_type_id);
+
+    if ($this->useTestStorage && $entity_type_id === WebPushSubscriptionInterface::ENTITY_TYPE) {
+      return new WebPushSubscriptionStorageTest($storage);
+    }
+
+    return $storage;
+  }
+
+}
+
+/**
  * Defines the entity storage that throws on "save" and "delete".
  */
-class WebPushSubscriptionDummyStorage extends WebPushSubscriptionStorage {
+class WebPushSubscriptionStorageTest extends WebPushSubscriptionStorage {
 
   /**
    * {@inheritdoc}
@@ -55,7 +108,9 @@ class WebPushSubscriptionDummyStorage extends WebPushSubscriptionStorage {
  * @group web_push_api
  * @coversDefaultClass \Drupal\web_push_api\Controller\WebPushSubscriptionController
  */
-class WebPushSubscriptionControllerFunctionalTest extends BrowserTestBase {
+class WebPushSubscriptionControllerKernelTest extends KernelTestBase {
+
+  use UserCreationTrait;
 
   /**
    * The set of straightforward tests.
@@ -137,6 +192,7 @@ class WebPushSubscriptionControllerFunctionalTest extends BrowserTestBase {
    */
   protected static $modules = [
     'user',
+    'system',
     'web_push_api',
   ];
 
@@ -155,14 +211,37 @@ class WebPushSubscriptionControllerFunctionalTest extends BrowserTestBase {
   protected $httpClient;
 
   /**
+   * The decorated "entity_type.manager" service.
+   *
+   * @var \Drupal\Tests\web_push_api\Kernel\EntityTypeManagerTest
+   */
+  protected $entityTypeManager;
+
+  /**
    * {@inheritdoc}
+   *
+   * @throws \Exception
    */
   protected function setUp(): void {
     parent::setUp();
 
-    $this->endpoint = Url
-      ::fromRoute('web_push_api.subscription')
-      ->toString(FALSE);
+    $this->installEntitySchema('user');
+    $this->installEntitySchema(WebPushSubscriptionInterface::ENTITY_TYPE);
+
+    $this->installSchema('user', ['users_data']);
+    $this->installSchema('system', ['sequences']);
+
+    $this->entityTypeManager = new EntityTypeManagerTest($this->container->get('entity_type.manager'));
+    $this->container->set('entity_type.manager', $this->entityTypeManager);
+
+    $user_storage = $this->entityTypeManager->getStorage('user');
+    $user_storage->save($user_storage->create([
+      'uid' => 0,
+      'name' => '',
+      'status' => 0,
+    ]));
+
+    $this->endpoint = Url::fromRoute('web_push_api.subscription')->toString(FALSE);
 
     // Ensure the URL is unchanged. Otherwise someone needs to update docs too.
     static::assertSame('/web-push-api/subscription', $this->endpoint);
@@ -250,7 +329,6 @@ class WebPushSubscriptionControllerFunctionalTest extends BrowserTestBase {
    * Tests the controller.
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
-   * @throws \ReflectionException
    * @throws \Exception
    */
   public function test(): void {
@@ -262,8 +340,7 @@ class WebPushSubscriptionControllerFunctionalTest extends BrowserTestBase {
       static::assertRequestResponse($this->sendRequest($method, $content), $errors);
     }
 
-    $web_push_factory = $this->container->get('web_push_api.factory');
-    $storage = $web_push_factory->getSubscriptionsStorage();
+    $storage = $this->entityTypeManager->getStorage(WebPushSubscriptionInterface::ENTITY_TYPE);
 
     // Create a subscription.
     // -------------------------------------------------------------------------
@@ -276,7 +353,7 @@ class WebPushSubscriptionControllerFunctionalTest extends BrowserTestBase {
     // The uid=0 subscription can receive a UID of a currently logged in user.
     // Thereafter the UID cannot be changed once set to a value above 0. That's
     // how we try deanonymizing subscriptions.
-    $this->drupalLogin($account);
+    $this->container->get('current_user')->setAccount($account);
 
     // Ensure the UID is automatically set to the ID of a logged in user.
     static::assertRequestResponse($this->sendRequest('PATCH', ['uid' => 900, 'auth' => 'aaa-bb', 'utc_offset' => -2] + static::SUBSCRIPTION));
@@ -288,7 +365,7 @@ class WebPushSubscriptionControllerFunctionalTest extends BrowserTestBase {
 
     // Ensure the subscription that has had an owner cannot become unowned.
     // -------------------------------------------------------------------------
-    $this->drupalLogout();
+    $this->container->get('current_user')->setAccount(new AnonymousUserSession());
     static::assertRequestResponse($this->sendRequest('PATCH', ['utc_offset' => 0] + static::SUBSCRIPTION));
     static::assertSubscription($storage->loadByEndpoint(static::SUBSCRIPTION['endpoint']), [
       'uid' => $account->id(),
@@ -297,9 +374,7 @@ class WebPushSubscriptionControllerFunctionalTest extends BrowserTestBase {
 
     // Update failed.
     // -------------------------------------------------------------------------
-    $web_push_factory_storage_reflection = new \ReflectionProperty($web_push_factory, 'storage');
-    $web_push_factory_storage_reflection->setAccessible(TRUE);
-    $web_push_factory_storage_reflection->setValue($web_push_factory, new WebPushSubscriptionDummyStorage($storage));
+    $this->entityTypeManager->useTestStorage(TRUE);
 
     static::assertRequestResponse($this->sendRequest('PATCH', static::SUBSCRIPTION), [
       'Unable to save the subscription.',
@@ -313,9 +388,20 @@ class WebPushSubscriptionControllerFunctionalTest extends BrowserTestBase {
 
     // Delete. We can pass the endpoint only.
     // -------------------------------------------------------------------------
-    $web_push_factory_storage_reflection->setValue($web_push_factory, $storage);
+    $this->entityTypeManager->useTestStorage(FALSE);
+
     static::assertRequestResponse($this->sendRequest('DELETE', ['endpoint' => static::SUBSCRIPTION['endpoint']]));
     static::assertNull($storage->loadByEndpoint(static::SUBSCRIPTION['endpoint']));
+
+    // Tests the storage and list builder.
+    // -------------------------------------------------------------------------
+    $subscription = $storage->create(['uid' => $account->id()] + static::SUBSCRIPTION);
+    $storage->save($subscription);
+    static::assertCount(1, $storage->loadByUserAccount($account));
+    $build = $this->entityTypeManager->getListBuilder(WebPushSubscriptionInterface::ENTITY_TYPE)->render();
+    static::assertCount(1, $build['table']['#rows']);
+    $storage->deleteByUserAccount($account);
+    static::assertCount(0, $storage->loadByUserId((int) $account->id()));
   }
 
 }

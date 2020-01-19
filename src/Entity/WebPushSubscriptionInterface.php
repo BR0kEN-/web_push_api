@@ -11,6 +11,8 @@ use Minishlink\WebPush\SubscriptionInterface;
  */
 interface WebPushSubscriptionInterface extends SubscriptionInterface, ContentEntityInterface {
 
+  public const ENTITY_TYPE = 'web_push_subscription';
+
   /**
    * Returns the account of a subscription owner.
    *

@@ -6,6 +6,7 @@ Do not expect this project to have something from this list:
 
 - A client-side implementation for requesting notification permission and/or subscription to push notifications.
 - A UI for creating and/or sending notifications.
+- A UI for managing configurations that might be needed for API.
 - A queue and a worker to handle notifications dispatch.
 
 ## Requirements
@@ -33,21 +34,21 @@ Do not expect this project to have something from this list:
   patch -p1 < 268.patch
   ```
 
+- Install the module (e.g. `drush en web_push_api`).
+
+## Usage
+
 - Generate a key-pair for [Voluntary Application Server Identification (VAPID) for Web Push](https://tools.ietf.org/id/draft-ietf-webpush-vapid-03.html). Store `public.key` and `private.key` outside of your document root.
 
-  ```bash configure-keys
+  ```bash
   openssl ecparam -genkey -name prime256v1 -out private.pem
   openssl ec -in private.pem -pubout -outform DER|tail -c 65|base64|tr -d '=' |tr '/+' '_-' >> public.key
   openssl ec -in private.pem -outform DER|tail -c +8|head -c 32|base64|tr -d '=' |tr '/+' '_-' >> private.key
   ```
 
-- Install the module (e.g. `drush en web_push_api`) and save the paths to your keys at `/admin/config/services/web-push-api`.
+- Do a client-side implementation (like https://github.com/Minishlink/web-push-php-example) and send a created subscription to the `/web-push-api/subscription` (`POST`, `PATCH` or `DELETE`).
 
-- Do a client-side implementation (example: https://github.com/Minishlink/web-push-php-example). The [subscription on a client must be created with contents from `public.key`](https://developers.google.com/web/fundamentals/push-notifications/subscribing-a-user#subscribe_a_user_with_pushmanager) you've generated before.
-
-## Usage
-
-- Create a subscription on a client and send it to the `/web-push-api/subscription` (`POST`, `PATCH` or `DELETE`).
+  The [subscription on a client should be created with contents from `public.key`](https://developers.google.com/web/fundamentals/push-notifications/subscribing-a-user#subscribe_a_user_with_pushmanager) you've generated before.
 
   ```javascript
   /**
@@ -89,13 +90,13 @@ Do not expect this project to have something from this list:
   <?php declare(strict_types=1);
 
   use Drupal\Core\Utility\Error;
-  use Drupal\web_push_api\WebPushNotification;
-  use Drupal\web_push_api\WebPushNotificationAction;
+  use Drupal\web_push_api\Component\WebPush;
+  use Drupal\web_push_api\Component\WebPushAuthVapid;
+  use Drupal\web_push_api\Component\WebPushNotification;
+  use Drupal\web_push_api\Component\WebPushNotificationAction;
 
   $logger = \Drupal::logger('web-push-notification');
-  /* @var \Drupal\web_push_api\WebPushFactory $factory */
-  $factory = \Drupal::service('web_push_api.factory');
-  $webpush = $factory->get();
+  $webpush = new WebPush(\Drupal::entityTypeManager(), new WebPushAuthVapid('/path/to/public.key', '/path/to/private.key'));
   $storage = $webpush->getSubscriptionsStorage();
   $notification = (string) (new WebPushNotification('Hello, buddy!'))
     ->addAction(new WebPushNotificationAction('Test action', 'go-go'))

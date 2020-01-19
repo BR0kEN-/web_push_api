@@ -1,6 +1,0 @@
-services:
-  web_push_api.factory:
-    class: Drupal\web_push_api\WebPushFactory
-    arguments:
-      - '@config.factory'
-      - '@entity_type.manager'

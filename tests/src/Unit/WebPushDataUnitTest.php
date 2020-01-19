@@ -3,10 +3,15 @@
 namespace Drupal\Tests\web_push_api\Unit;
 
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Tests\UnitTestCase;
-use Drupal\web_push_api\WebPushData;
-use Drupal\web_push_api\WebPushNotification;
-use Drupal\web_push_api\WebPushNotificationAction;
+use Drupal\web_push_api\Component\WebPushAuth;
+use Drupal\web_push_api\Component\WebPushAuthVapid;
+use Drupal\web_push_api\Component\WebPushData;
+use Drupal\web_push_api\Component\WebPushNotification;
+use Drupal\web_push_api\Component\WebPushNotificationAction;
+use org\bovigo\vfs\vfsStream;
 
 /**
  * Tests that data buckets properly format the data.
@@ -16,7 +21,7 @@ use Drupal\web_push_api\WebPushNotificationAction;
 class WebPushDataUnitTest extends UnitTestCase {
 
   /**
-   * Tests that data buckets properly format the data.
+   * {@inheritdoc}
    */
   public function testWebPushData(): void {
     $data = new WebPushData(['a' => 1, 'b' => ['c' => 2]]);
@@ -28,7 +33,70 @@ class WebPushDataUnitTest extends UnitTestCase {
   }
 
   /**
-   * Tests the notification bucket.
+   * {@inheritdoc}
+   */
+  public function testWebPushAuth(): void {
+    $data = ['kk' => 12, 'dd' => new \stdClass()];
+    $auth = new WebPushAuth('asdasd', $data);
+    static::assertSame(['asdasd' => $data], $auth->toArray());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function testWebPushAuthVapid(): void {
+    // Generate the subject.
+    // -------------------------------------------------------------------------
+    $url_generator = $this->createMock(UrlGeneratorInterface::class);
+    $url_generator
+      ->expects(static::once())
+      ->method('generateFromRoute')
+      ->with('<front>')
+      ->willReturn('https://www.site.com');
+
+    $container = new ContainerBuilder();
+    $container->set('url_generator', $url_generator);
+    \Drupal::setContainer($container);
+
+    $auth = new WebPushAuthVapid('pubkey', 'private_key');
+    static::assertSame([
+      'VAPID' => [
+        'publicKey' => 'pubkey',
+        'privateKey' => 'private_key',
+        'subject' => 'https://www.site.com',
+      ],
+    ], $auth->toArray());
+
+    // Custom subject.
+    // -------------------------------------------------------------------------
+    $auth = new WebPushAuthVapid('a', 'b', ['subject' => 'mailto:me@site.org']);
+    static::assertSame([
+      'VAPID' => [
+        'subject' => 'mailto:me@site.org',
+        'publicKey' => 'a',
+        'privateKey' => 'b',
+      ],
+    ], $auth->toArray());
+
+    // Read keys from files.
+    // -------------------------------------------------------------------------
+    $fs = vfsStream::setup('root');
+
+    vfsStream::newFile('public.key')->at($fs)->withContent('the public yeah!');
+    vfsStream::newFile('private.key')->at($fs)->withContent('the private key');
+
+    $auth = new WebPushAuthVapid('vfs://root/public.key', 'vfs://root/private.key', ['subject' => 'subj']);
+    static::assertSame([
+      'VAPID' => [
+        'subject' => 'subj',
+        'publicKey' => 'the public yeah!',
+        'privateKey' => 'the private key',
+      ],
+    ], $auth->toArray());
+  }
+
+  /**
+   * {@inheritdoc}
    */
   public function testWebPushNotification(): void {
     $notification = new WebPushNotification('The notification!');

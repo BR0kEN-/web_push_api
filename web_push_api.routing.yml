@@ -11,16 +11,6 @@ web_push_api.subscription:
     # someone decides to share this then we'll bother them by our notifications.
     _access: 'TRUE'
 
-web_push_api.settings:
-  path: '/admin/config/services/web-push-api'
-  defaults:
-    _form: 'Drupal\web_push_api\Form\WebPushSettingsForm'
-    _title: 'Web Push API settings'
-  requirements:
-    _permission: 'administer web push settings'
-  options:
-    _admin_route: TRUE
-
 entity.web_push_subscription.collection:
   path: '/admin/config/services/web-push-api/subscriptions'
   defaults:

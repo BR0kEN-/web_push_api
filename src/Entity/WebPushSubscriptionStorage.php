@@ -45,7 +45,7 @@ class WebPushSubscriptionStorage extends SqlContentEntityStorage {
    *   The list of subscriptions.
    */
   public function loadByUserAccount(AccountInterface $account): \Generator {
-    yield from $this->loadByUserId($account->id());
+    yield from $this->loadByUserId((int) $account->id());
   }
 
   /**
@@ -73,7 +73,7 @@ class WebPushSubscriptionStorage extends SqlContentEntityStorage {
    *   When the operation fails.
    */
   public function deleteByUserAccount(AccountInterface $account): void {
-    $this->deleteByUserId($account->id());
+    $this->deleteByUserId((int) $account->id());
   }
 
   /**

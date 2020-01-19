@@ -4,14 +4,13 @@ namespace Drupal\web_push_api\Controller;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Utility\Error;
 use Drupal\web_push_api\Entity\WebPushSubscriptionInterface;
-use Drupal\web_push_api\Entity\WebPushSubscriptionStorage;
-use Drupal\web_push_api\WebPushFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,16 +21,19 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
  */
 class WebPushSubscriptionController extends ControllerBase {
 
+  /**
+   * The list of headers the inbound request must have present.
+   */
   public const HEADERS = [
     'Content-Type' => 'application/json',
   ];
 
   /**
-   * An instance of the "web_push_api.factory" service.
+   * A storage of the "web_push_subscription" entities.
    *
-   * @var \Drupal\web_push_api\WebPushFactory
+   * @var \Drupal\web_push_api\Entity\WebPushSubscriptionStorage
    */
-  protected $webPushFactory;
+  protected $storage;
 
   /**
    * The logger channel.
@@ -42,28 +44,35 @@ class WebPushSubscriptionController extends ControllerBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function __construct(
-    WebPushFactory $web_push_factory,
     AccountInterface $current_user,
     TranslationInterface $string_translation,
+    EntityTypeManagerInterface $entity_type_manager,
     LoggerChannelFactoryInterface $logger_factory
   ) {
     $this->currentUser = $current_user;
     $this->loggerFactory = $logger_factory;
-    $this->webPushFactory = $web_push_factory;
     $this->stringTranslation = $string_translation;
+    $this->entityTypeManager = $entity_type_manager;
     $this->loggerChannel = $this->loggerFactory->get('web_push_api.controller');
+    $this->storage = $this->entityTypeManager->getStorage(WebPushSubscriptionInterface::ENTITY_TYPE);
   }
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public static function create(ContainerInterface $container): self {
     return new static(
-      $container->get('web_push_api.factory'),
       $container->get('current_user'),
       $container->get('string_translation'),
+      $container->get('entity_type.manager'),
       $container->get('logger.factory')
     );
   }
@@ -78,11 +87,13 @@ class WebPushSubscriptionController extends ControllerBase {
       return static::response(...$errors);
     }
 
-    $storage = $this->webPushFactory->getSubscriptionsStorage();
-    $method = [$this, $request->getMethod() === 'DELETE' ? 'delete' : 'manage'];
     $body = $errors->getReturn();
 
-    return static::response(...\call_user_func($method, $storage, $storage->loadByEndpoint($body['endpoint']), $body));
+    return static::response(...\call_user_func(
+      [$this, $request->getMethod() === 'DELETE' ? 'delete' : 'manage'],
+      $this->storage->loadByEndpoint($body['endpoint']),
+      $body
+    ));
   }
 
   /**
@@ -132,8 +143,6 @@ class WebPushSubscriptionController extends ControllerBase {
   /**
    * Creates/updates the subscription.
    *
-   * @param \Drupal\web_push_api\Entity\WebPushSubscriptionStorage $storage
-   *   The subscriptions storage.
    * @param \Drupal\web_push_api\Entity\WebPushSubscriptionInterface|null $subscription
    *   The subscription.
    * @param array $body
@@ -142,8 +151,8 @@ class WebPushSubscriptionController extends ControllerBase {
    * @return \Generator
    *   The list of errors (empty if none).
    */
-  protected function manage(WebPushSubscriptionStorage $storage, ?WebPushSubscriptionInterface $subscription, array $body): \Generator {
-    $subscription = $subscription ?? $storage->create();
+  protected function manage(?WebPushSubscriptionInterface $subscription, array $body): \Generator {
+    $subscription = $subscription ?? $this->storage->create();
     $body['uid'] = $this->currentUser->id();
 
     foreach ($body as $key => $value) {
@@ -160,7 +169,7 @@ class WebPushSubscriptionController extends ControllerBase {
 
     if (!isset($violation)) {
       try {
-        $storage->save($subscription);
+        $this->storage->save($subscription);
       }
       catch (\Exception $e) {
         $this->loggerChannel->error(Error::renderExceptionSafe($e));
@@ -172,18 +181,16 @@ class WebPushSubscriptionController extends ControllerBase {
   /**
    * Removes the subscription.
    *
-   * @param \Drupal\web_push_api\Entity\WebPushSubscriptionStorage $storage
-   *   The subscriptions storage.
    * @param \Drupal\web_push_api\Entity\WebPushSubscriptionInterface|null $subscription
    *   The subscription.
    *
    * @return \Generator
    *   The list of errors (empty if none).
    */
-  protected function delete(WebPushSubscriptionStorage $storage, ?WebPushSubscriptionInterface $subscription): \Generator {
+  protected function delete(?WebPushSubscriptionInterface $subscription): \Generator {
     if ($subscription !== NULL) {
       try {
-        $storage->delete([$subscription]);
+        $this->storage->delete([$subscription]);
       }
       catch (\Exception $e) {
         $this->loggerChannel->error(Error::renderExceptionSafe($e));
