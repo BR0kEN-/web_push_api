@@ -21,19 +21,6 @@ Do not expect this project to have something from this list:
   composer require drupal/web_push_api
   ```
 
-  Navigate to the directory of `minishlink/web-push` package:
-
-  ```bash
-  cd "$(composer config vendor-dir)/minishlink/web-push/"
-  ```
-
-  Download and apply the patch:
-
-  ```bash
-  curl https://patch-diff.githubusercontent.com/raw/web-push-libs/web-push-php/pull/268.patch -o ./268.patch
-  patch -p1 < 268.patch
-  ```
-
 - Install the module (e.g. `drush en web_push_api`).
 
 ## Usage
