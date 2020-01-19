@@ -114,7 +114,7 @@ Do not expect this project to have something from this list:
 
 ## Testing
 
-At the moment [tests could not be run on Drupal.org CI](https://www.drupal.org/pift-ci-job/1547248) due to missing `gmp` PHP extension. However, there is a [project mirror on Github](https://github.com/BR0kEN-/web_push_api) to run [tests on Travis CI](https://travis-ci.com/BR0kEN-/web_push_api).
+At the moment [tests could not run on Drupal.org CI](https://www.drupal.org/pift-ci-job/1547248) due to missing `gmp` PHP extension. However, there is a [project mirror on Github](https://github.com/BR0kEN-/web_push_api) to run [tests on Travis CI](https://travis-ci.com/BR0kEN-/web_push_api).
 
 ## Similar projects
 
