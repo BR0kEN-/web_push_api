@@ -7,6 +7,7 @@
 !/tests/
 
 !/.gitignore
+!/.travis.yml
 !/composer.json
 !/README.md
 !/web_push_api.*

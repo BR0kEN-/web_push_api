@@ -1,0 +1,35 @@
+language: php
+dist: xenial
+
+php:
+  - 7.2
+
+services:
+  - mysql
+
+cache:
+  apt: true
+  directories:
+    - "$HOME/.composer/cache"
+    - "$HOME/.drush/cache"
+    - "$HOME/.npm"
+
+branches:
+  only:
+    - /^8\.([0-9]+|x)\-[0-9]+\.([0-9]+|x)$/
+
+env:
+  global:
+    - PATH="$PATH:$HOME/.composer/vendor/bin:$HOME/.config/composer/vendor/bin"
+
+before_install:
+  - composer global require thunder/travis
+
+install:
+  - test-drupal-project build
+  - cd "$(composer config vendor-dir)/minishlink/web-push/"
+  - curl https://patch-diff.githubusercontent.com/raw/web-push-libs/web-push-php/pull/268.patch -o 268.patch
+  - patch -p1 < 268.patch
+
+script:
+  - test-drupal-project
