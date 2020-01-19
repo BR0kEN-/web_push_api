@@ -4,8 +4,6 @@ description: 'Provides the Push API subscriptions storage and API for sending no
 package: 'Web services'
 core: 8.x
 
-configure: web_push_api.settings
-
 dependencies:
   - drupal:user
   - drupal:system

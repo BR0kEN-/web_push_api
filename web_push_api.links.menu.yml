@@ -1,5 +1,5 @@
-web_push_api.settings:
-  title: 'Web Push API'
+entity.web_push_subscription.collection:
+  title: 'Web Push API subscriptions'
   parent: system.admin_config_services
-  route_name: web_push_api.settings
-  description: 'Configure Web Push API settings.'
+  route_name: entity.web_push_subscription.collection
+  description: 'View the list of subscriptions, their actuality and owners.'
