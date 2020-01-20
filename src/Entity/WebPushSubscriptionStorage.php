@@ -64,6 +64,19 @@ class WebPushSubscriptionStorage extends SqlContentEntityStorage {
   }
 
   /**
+   * Removes all subscriptions with the given endpoint.
+   *
+   * @param string $endpoint
+   *   The Push API endpoint.
+   *
+   * @throws \Drupal\Core\Entity\EntityStorageException
+   *   When the operation fails.
+   */
+  public function deleteByEndpoint(string $endpoint): void {
+    $this->delete($this->loadByProperties(['endpoint' => $endpoint]));
+  }
+
+  /**
    * Removes user's Web Push API subscriptions.
    *
    * @param \Drupal\Core\Session\AccountInterface $account

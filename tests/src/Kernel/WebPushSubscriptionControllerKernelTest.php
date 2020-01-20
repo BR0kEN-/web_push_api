@@ -237,7 +237,7 @@ class WebPushSubscriptionControllerKernelTest extends KernelTestBase {
     $user_storage = $this->entityTypeManager->getStorage('user');
     $user_storage->save($user_storage->create([
       'uid' => 0,
-      'name' => '',
+      'name' => 'Anonymous',
       'status' => 0,
     ]));
 
@@ -402,6 +402,15 @@ class WebPushSubscriptionControllerKernelTest extends KernelTestBase {
     static::assertCount(1, $build['table']['#rows']);
     $storage->deleteByUserAccount($account);
     static::assertCount(0, $storage->loadByUserId($account->id()));
+
+    // Tests the storage and list builder (anon user + "deleteByEndpoint()").
+    // ------------------------------------------------------------------------.
+    $subscription = $storage->create(static::SUBSCRIPTION);
+    $storage->save($subscription);
+    $build = $this->entityTypeManager->getListBuilder(WebPushSubscriptionInterface::ENTITY_TYPE)->render();
+    static::assertCount(1, $build['table']['#rows']);
+    $storage->deleteByEndpoint(static::SUBSCRIPTION['endpoint']);
+    static::assertCount(0, $storage->loadByUserAccount($account));
   }
 
 }

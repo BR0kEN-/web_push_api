@@ -186,6 +186,8 @@ class WebPushSubscription extends ContentEntityBase implements WebPushSubscripti
       ->setRequired(TRUE)
       ->setReadOnly(TRUE)
       ->setSetting('target_type', 'user')
+      // By default a subscription belongs to the anonymous user.
+      ->setDefaultValue(0)
       ->setDescription(t('The username of the content author.'));
 
     return $fields;
