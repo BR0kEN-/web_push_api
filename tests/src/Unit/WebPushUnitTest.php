@@ -13,6 +13,8 @@ use Drupal\web_push_api\Entity\WebPushSubscriptionStorage;
 
 /**
  * Tests the Web Push manager.
+ *
+ * @group web_push_api
  */
 class WebPushUnitTest extends UnitTestCase {
 
