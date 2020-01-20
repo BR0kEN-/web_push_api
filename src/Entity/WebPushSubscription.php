@@ -128,6 +128,7 @@ class WebPushSubscription extends ContentEntityBase implements WebPushSubscripti
       ->setRequired(TRUE)
       ->setReadOnly(TRUE)
       ->setSetting('max_length', 512)
+      ->setSetting('unique_key', TRUE)
       ->setDescription(t('The communication endpoint.'));
 
     $fields['user_agent'] = BaseFieldDefinition::create('string')
