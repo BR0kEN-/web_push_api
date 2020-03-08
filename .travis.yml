@@ -2,7 +2,7 @@ language: php
 dist: xenial
 
 php:
-  - 7.3
+  - 7.2
 
 services:
   - mysql
@@ -23,6 +23,7 @@ env:
     - PATH="$PATH:$HOME/.composer/vendor/bin:$HOME/.config/composer/vendor/bin"
     - DRUPAL_TRAVIS_TEST_CODING_STYLES=false
     - DRUPAL_TRAVIS_VERBOSE=true
+    - DRUPAL_TRAVIS_COMPOSER_PROJECT="drupal/recommended-project=8.*"
 
 before_install:
   - composer global require thunder/travis
