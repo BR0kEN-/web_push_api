@@ -90,7 +90,7 @@ Do not expect this project to have something from this list:
     ->setBody('This is a test notification.');
 
   foreach ($storage->loadMultiple() as $subscription) {
-    $webpush->sendOneNotification($subscription, $notification);
+    $webpush->queueNotification($subscription, $notification);
 
     foreach ($webpush->flush(100) as $report) {
       if ($report->isSuccess()) {
