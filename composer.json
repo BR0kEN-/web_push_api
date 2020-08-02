@@ -13,7 +13,7 @@
         "browser push notifications"
     ],
     "require": {
-        "web-push-libs/web-push": "^5.2"
+        "minishlink/web-push": "^6"
     },
     "authors": [
         {

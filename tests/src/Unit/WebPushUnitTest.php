@@ -31,7 +31,7 @@ class WebPushUnitTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->entityTypeManager = $this
@@ -74,8 +74,14 @@ class WebPushUnitTest extends UnitTestCase {
       ->method('getContentEncoding')
       ->willReturn('aesgcm');
 
-    static::assertTrue($web_push->sendNotification($subscription, (string) new WebPushNotification('Title!')));
-    static::assertAttributeCount(1, 'notifications', $web_push);
+    $web_push->queueNotification($subscription, (string) new WebPushNotification('Title!'));
+    $web_push_reflection = new \ReflectionObject($web_push);
+    $notifications = $web_push_reflection
+      ->getParentClass()
+      ->getProperty('notifications');
+
+    $notifications->setAccessible(TRUE);
+    static::assertCount(1, $notifications->getValue($web_push));
   }
 
   /**
