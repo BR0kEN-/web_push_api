@@ -26,6 +26,8 @@ env:
     - DRUPAL_TRAVIS_COMPOSER_PROJECT="drupal/recommended-project=8.*"
 
 before_install:
+  # @todo `thunder/travis` doesn't work with composer 2.x. https://github.com/thunder/travis/issues/58
+  - composer self-update --1
   - composer global require thunder/travis
 
 script:
